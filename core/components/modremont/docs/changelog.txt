@@ -1,0 +1,95 @@
+Changelog for modRemont.
+
+2.0.15-pl
+==============
+- Fixed superboxselect with msProduct
+
+2.0.14-pl
+==============
+- Fixed new combobox type select with msProduct
+
+2.0.13-pl
+==============
+- Added new combobox type select with msProduct
+
+2.0.12-pl
+==============
+- Added tab on resources
+
+2.0.11-pl
+==============
+- Added default icons for templates
+
+2.0.10-pl
+==============
+- Added default image in grid table
+
+2.0.9-pl
+==============
+- Edited window modal with editing item
+
+2.0.8-pl
+==============
+- Added setting with type source.
+- Fix: Lexicon alias in window modal category.
+
+2.0.7-pl
+==============
+- Added TinyMCE in field description.
+
+2.0.6-pl
+==============
+- Added topBar.
+- Added Date in window modal and in grid table.
+
+2.0.5-pl
+==============
+- Added Users from modUser.
+- Added image in grid table and upload image in window modal.
+
+2.0.4-pl
+==============
+- Added Categories from miniShop2.
+- Added Categories in Grid-table.
+- Added fields with type select
+
+2.0.3-pl
+==============
+- Added static templates.
+
+2.0.2-pl
+==============
+- Updated system settings.
+- Added source "modMediaSource".
+
+2.0.1-pl
+==============
+- Added setting install of default events "modEvent".
+
+2.0.0-pl
+==============
+- New build script.
+- [#4] Ability to specify the exact repository to install package from.
+- [#6] Renaming script works in any environment.
+- Updated tables resolver.
+- All tables now InnoDB by default.
+- Removed shell renaming script.
+
+1.0.1-beta
+==============
+- PSR-2
+- Requires at least MODX 2.3
+- Disabling "office" resolver will clear its files from built package.
+- Fixed some typos.
+
+1.0.0-beta
+==============
+- Optimized for MODX 2.3
+- Improved processors
+- Disabled plugin and system settings
+- Improved UI
+- Added grid actions
+- Added icons in menu
+- Added search in grid
+- Grid sorting
+- Enable and disable actions

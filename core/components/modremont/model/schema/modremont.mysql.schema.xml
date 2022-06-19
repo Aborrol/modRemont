@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model package="modremont" baseClass="xPDOObject" platform="mysql" defaultEngine="InnoDB" phpdoc-package="modremont"
+       version="1.1">
+
+
+    <object class="modRemontCategory" table="modremont_categories" extends="xPDOSimpleObject">
+        <field key="pagetitle" dbtype="varchar" precision="191" phptype="string" null="false" default="" index="fulltext"/>
+        <field key="longtitle" dbtype="varchar" precision="191" phptype="string" null="true" default="" index="fulltext"/>
+        <field key="description" dbtype="text" phptype="string" null="true" default="" index="fulltext" />
+        <field key="content" dbtype="mediumtext" phptype="string" null="true" index="fulltext"  />
+        <field key="contentbottom" dbtype="mediumtext" phptype="string" null="true" index="fulltext"/>
+        <field key="uri" dbtype="text" phptype="string" null="true" index="index" />
+        <field key="image" dbtype="varchar" precision="255" phptype="string" null="true" />
+        <field key="priceby" dbtype="varchar" precision="50" phptype="string" null="true" default="text/html" />
+        <field key="active" dbtype="tinyint" precision="1" phptype="integer" null="false" default="1" />
+        <index alias="pagetitle" name="pagetitle" primary="false" unique="false" type="BTREE">
+			<column key="pagetitle" length="" collation="A" null="false" />
+		</index>
+        <index alias="active" name="active" primary="false" unique="false" type="BTREE">
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+    </object>
+    <object class="modRemontModel" table="modremont_models" extends="xPDOSimpleObject">
+        <field key="pagetitle" dbtype="varchar" precision="191" phptype="string" null="false" default="" index="fulltext"/>
+        <field key="longtitle" dbtype="varchar" precision="191" phptype="string" null="false" default="" index="fulltext"/>
+        <field key="year" dbtype="varchar" precision="50" phptype="string" null="false" />
+        <field key="article" dbtype="varchar" precision="50" phptype="string" null="false" />
+        <field key="category_id" dbtype="int" precision="10" phptype="integer" null="false" />
+        <field key="uri" dbtype="text" phptype="string" null="true" index="index" />
+        <field key="image" dbtype="varchar" precision="255" phptype="string" null="false" />
+        <field key="description" dbtype="text" phptype="string" null="true" default=""/>
+        <field key="content" dbtype="mediumtext" phptype="string" null="true" index="fulltext" />
+        <field key="contentbottom" dbtype="mediumtext" phptype="string" null="true" index="fulltext"/>
+        <field key="services" dbtype="text" phptype="json" null="true"/>
+        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+
+        <index alias="pagetitle" name="pagetitle" primary="false" unique="false" type="BTREE">
+            <column key="pagetitle" length="" collation="A" null="false"/>
+        </index>
+        <index alias="active" name="active" primary="false" unique="false" type="BTREE">
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+        <composite alias="modRemontModelService" class="modRemontModelService" local="id" foreign="model_id" cardinality="many" owner="local" />
+        <aggregate alias="modRemontCategory" class="modRemontCategory" local="category_id" foreign="id" cardinality="one" owner="foreign" />
+    </object>
+    <object class="modRemontProblem" table="modremont_problems" extends="xPDOSimpleObject">
+        <field key="pagetitle" dbtype="varchar" precision="191" phptype="string" null="false" default="" index="fulltext"/>
+        <field key="category_id" dbtype="int" precision="40" phptype="integer" null="false" />
+        
+        <field key="uri" dbtype="text" phptype="string" null="true" index="index" />
+        <field key="image" dbtype="varchar" precision="255" phptype="string" null="false" />
+        <field key="description" dbtype="text" phptype="string" null="true" default=""/>
+        <field key="content" dbtype="mediumtext" phptype="string" index="fulltext" />
+        <field key="contentbottom" dbtype="mediumtext" phptype="string" index="fulltext"/>
+        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+        <field key="categories" dbtype="text" phptype="json" null="true"/>
+        <index alias="pagetitle" name="pagetitle" primary="false" unique="false" type="BTREE">
+            <column key="pagetitle" length="" collation="A" null="false"/>
+        </index>
+        <index alias="active" name="active" primary="false" unique="false" type="BTREE">
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+        <aggregate alias="modRemontCategory" class="modRemontCategory" local="category_id" foreign="id" cardinality="many" owner="foreign" />
+    </object>
+    <object class="modRemontDefect" table="modremont_defects" extends="xPDOSimpleObject">
+        <field key="pagetitle" dbtype="varchar" precision="191" phptype="string" null="false" default="" index="fulltext"/>
+        <field key="problem_id" dbtype="int" precision="40" phptype="integer" null="false" />
+        <field key="image" dbtype="varchar" precision="255" phptype="string" null="false" />
+        <field key="description" dbtype="text" phptype="string" null="true" default=""/>
+        <field key="content" dbtype="mediumtext" phptype="string" index="fulltext" />
+        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+        <index alias="pagetitle" name="pagetitle" primary="false" unique="false" type="BTREE">
+            <column key="pagetitle" length="" collation="A" null="false"/>
+        </index>
+        <index alias="active" name="active" primary="false" unique="false" type="BTREE">
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+        <aggregate alias="modRemontProblem" class="modRemontProblem" local="problem_id" foreign="id" cardinality="one" owner="foreign" />
+    </object>
+    <object class="modRemontService" table="modremont_services" extends="xPDOSimpleObject">
+        <field key="pagetitle" dbtype="varchar" precision="191" phptype="string" null="false" default="" index="fulltext"/>
+        <field key="longtitle" dbtype="varchar" precision="191" phptype="string" null="false" default="" index="fulltext"/>
+        <field key="uri" dbtype="text" phptype="string" null="true" index="index" />
+        <field key="price" dbtype="varchar" precision="50" phptype="string" null="false" />
+        <field key="priceby" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+        <field key="time" dbtype="varchar" precision="50" phptype="string" null="false" />
+        <field key="timeby" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+        <field key="description" dbtype="text" phptype="string" null="true" default=""/>
+        <field key="content" dbtype="mediumtext" phptype="string" index="fulltext" />
+        <field key="contentbottom" dbtype="mediumtext" phptype="string" index="fulltext"/>
+        <field key="image" dbtype="varchar" precision="255" phptype="string" null="false" />
+        <field key="category_id" dbtype="int" precision="10" phptype="integer" null="false" />
+        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+        <field key="categories" dbtype="text" phptype="json" null="true"/>
+        <field key="defects" dbtype="text" phptype="json" null="true"/>
+        <index alias="pagetitle" name="pagetitle" primary="false" unique="false" type="BTREE">
+            <column key="pagetitle" length="" collation="A" null="false"/>
+        </index>
+        <index alias="active" name="active" primary="false" unique="false" type="BTREE">
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+        <aggregate alias="modRemontCategory" class="modRemontCategory" local="category_id" foreign="id" cardinality="one" owner="foreign" />
+    </object>
+    <object class="modRemontModelService" table="modremont_model_services" extends="xPDOSimpleObject">
+    <field key="model_id" dbtype="int" precision="10" phptype="integer" attributes="unsigned" null="false"/>
+    <field key="service_id" dbtype="int" precision="10" phptype="integer" attributes="unsigned" null="false"/>
+        <field key="pagetitle" dbtype="varchar" precision="191" phptype="string" null="false" default="" index="fulltext"/>
+        <field key="longtitle" dbtype="varchar" precision="191" phptype="string" null="false" default="" index="fulltext"/>
+        <field key="uri" dbtype="text" phptype="string" null="true" index="index" />
+        <field key="price" dbtype="varchar" precision="50" phptype="string" null="false" />
+        <field key="priceby" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+        <field key="time" dbtype="varchar" precision="50" phptype="string" null="false" />
+        <field key="timeby" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+        <field key="description" dbtype="text" phptype="string" null="true" default=""/>
+        <field key="content" dbtype="mediumtext" phptype="string" index="fulltext" />
+        <field key="contentbottom" dbtype="mediumtext" phptype="string" index="fulltext"/>
+        <field key="image" dbtype="varchar" precision="255" phptype="string" null="false" />
+        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+        <field key="defects" dbtype="text" phptype="json" null="true"/>
+ <index alias="model_id" name="model_id" primary="false" unique="false" type="BTREE">
+            <column key="model_id" length="" collation="A" null="false"/>
+        </index>
+        <index alias="service" name="service" primary="false" unique="false" type="BTREE">
+            <column key="service_id" length="" collation="A" null="false"/>
+        </index>
+        <index alias="active" name="active" primary="false" unique="false" type="BTREE">
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+        <aggregate alias="modRemontModel" class="modRemontModel" local="model_id" foreign="id" cardinality="one" owner="foreign" />
+    </object>
+    <object class="modRemontUrl" table="modremont_urls" extends="xPDOSimpleObject">
+        <field key="url" dbtype="varchar" precision="191" phptype="string" null="false" index="index" />
+        <field key="pagetitle" dbtype="varchar" precision="191" phptype="string" null="false" default="" index="fulltext"/>
+        <field key="type" dbtype="varchar" precision="191" phptype="string" null="false" default="" index="index"/>
+        <field key="type_id" dbtype="int" precision="10" phptype="integer" attributes="unsigned" null="false"/>
+
+        <field key="category_id"  dbtype="int" precision="10" phptype="integer" attributes="unsigned" null="true"/>
+        <field key="models" dbtype="text" phptype="json" null="true"/>
+        <field key="defects" dbtype="text" phptype="json" null="true"/>
+        <field key="services" dbtype="text" phptype="json" null="true"/>
+        <field key="modelservices" dbtype="text" phptype="json" null="true"/>
+
+        <field key="active" dbtype="tinyint" precision="1" phptype="boolean" null="true" default="1"/>
+        <index alias="url" name="url" primary="false" unique="false" type="BTREE">
+            <column key="url" length="" collation="A" null="false"/>
+        </index>
+        <index alias="active" name="active" primary="false" unique="false" type="BTREE">
+            <column key="active" length="" collation="A" null="false"/>
+        </index>
+    </object>
+</model>
