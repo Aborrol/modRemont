@@ -79,15 +79,6 @@ Ext.extend(modRemont.window.CreateModel, MODx.Window, {
             }
 
     },
-    generateAliasRealTime: function(title) {
-        // check some system settings before doing real time alias transliteration
-        if (parseInt(MODx.config.friendly_alias_realtime) && parseInt(MODx.config.automatic_alias)) {
-
-            if (this.config.aliaswasempty && title !== '') {
-                this.translitAlias(title);
-            }
-        }
-    },
     generateModelNameRealTime: function(title) {
             if (this.config.namewasempty && title !== '') {
                
