@@ -17,10 +17,11 @@ class modRemontUrlGenerateProcessor extends modObjectProcessor
             return $this->failure($this->modx->lexicon('access_denied'));
         }
 
-        $base_path = $this->modx->getOption('modremont_basepath');
           $this->modx->removeCollection('modRemontUrl',array());
           $categories = $this->modx->getCollection('modRemontCategory');
           $categoryUrls = [];
+          $categoryBreadcrumbs = [];
+          $modelsBreadcrumbs = [];
           $models = $this->modx->getCollection('modRemontModel');
           $models_category = [];
           $modelsUrls = [];
@@ -30,10 +31,12 @@ class modRemontUrlGenerateProcessor extends modObjectProcessor
           $modelservices = $this->modx->getCollection('modRemontModelService');
           foreach($categories as $category){
             $categoryUrls[$category->get('id')] = $category->get('uri');
+            $categoryBreadcrumbs[$category->get('id')] = [$category->get('uri')=>$category->get('pagetitle')];
             $newObject = $this->modx->newObject('modRemontUrl');
             $newObject->set('type', 'category');
             $newObject->set('type_id', $category->get('id'));
-            $newObject->set('url', $base_path.$category->get('uri'));
+            $newObject->set('breadcrumb', [$category->get('uri')=>$category->get('pagetitle')]);
+            $newObject->set('url', $category->get('uri'));
             $newObject->set('pagetitle', $category->get('pagetitle'));
             $modelsIds = [];
             $problemsIds = [];
@@ -49,12 +52,12 @@ class modRemontUrlGenerateProcessor extends modObjectProcessor
                   if($problem->get('id') == $defect->get('problem_id'))
                     $defectsIds = ['id'=> $defect->get('id'), 'pagetitle' => $defect->get('pagetitle'), 'active' => $defect->get('active')];
                 }
-                $problemsIds[] = ['id'=> $problem->get('id'), 'pagetitle' => $problem->get('pagetitle'), 'uri' => $problem->get('uri'), 'url' => $base_path.$category->get('uri').'/'.$problem->get('url'), 'defects' => $defectsIds, 'active' => $problem->get('active')];
+                $problemsIds[] = ['id'=> $problem->get('id'), 'pagetitle' => $problem->get('pagetitle'), 'uri' => $problem->get('uri'), 'url' => $category->get('uri').'/'.$problem->get('url'), 'defects' => $defectsIds, 'active' => $problem->get('active')];
               }
             }
             foreach($services as $service){
               if(is_array($service->get('categories')) && in_array($category->get('id'), $service->get('categories'))){
-                $servicesIds[] = ['id'=> $service->get('id'), 'pagetitle' => $service->get('pagetitle'),'price' => $service->get('price'),'priceby' => $service->get('priceby'),'time' => $service->get('time'),'timeby' => $service->get('timeby'), 'uri' => $service->get('uri'), 'url' => $base_path.$category->get('uri').'/'.$service->get('url'),  'active' => $service->get('active')];
+                $servicesIds[] = ['id'=> $service->get('id'), 'pagetitle' => $service->get('pagetitle'),'price' => $service->get('price'),'priceby' => $service->get('priceby'),'time' => $service->get('time'),'timeby' => $service->get('timeby'), 'uri' => $service->get('uri'), 'url' => $category->get('uri').'/'.$service->get('url'),  'active' => $service->get('active')];
               }
             }
             $newObject->set('models', $modelsIds);
@@ -68,8 +71,11 @@ class modRemontUrlGenerateProcessor extends modObjectProcessor
           foreach($models as $model){
             $models_category[$model->get('id')] = $model->get('category_id');
             $modelsUrls[$model->get('id')] = $model->get('uri');
+            $breadcrumb = [$categoryUrls[$model->get('category_id')].'/'.$model->get('uri') => $model->get('pagetitle')] ;
+            $modelsBreadcrumbs[$model->get('id')] = $breadcrumb;
             $newObject = $this->modx->newObject('modRemontUrl');
-            $newObject->set('url', $base_path.$categoryUrls[$model->get('category_id')].'/'.$model->get('uri')); 
+            $newObject->set('url', $categoryUrls[$model->get('category_id')].'/'.$model->get('uri')); 
+            $newObject->set('breadcrumb', [$categoryBreadcrumbs[$model->get('category_id')], $breadcrumb]); 
             $newObject->set('pagetitle', $model->get('pagetitle'));
             $newObject->set('type', 'model');
             $newObject->set('type_id', $model->get('id'));
@@ -78,7 +84,7 @@ class modRemontUrlGenerateProcessor extends modObjectProcessor
             foreach($modelservices as $modelservice){
               if($modelservice->get('model_id') == $model->get('id')){
 
-                $modelServicesIds[] = ['id'=> $model->get('id'), 'pagetitle' => $modelservice->get('pagetitle'), 'url' => $base_path.$categoryUrls[$model->get('category_id')].'/'.$model->get('uri').'/'.$modelservice->get('url'), 'uri' => $modelservice->get('uri'),'defects' => $modelservice->get('defects'), 'active' => $modelservice->get('active')];
+                $modelServicesIds[] = ['id'=> $model->get('id'), 'pagetitle' => $modelservice->get('pagetitle'), 'url' => $categoryUrls[$model->get('category_id')].'/'.$model->get('uri').'/'.$modelservice->get('url'), 'uri' => $modelservice->get('uri'),'defects' => $modelservice->get('defects'), 'active' => $modelservice->get('active')];
               }
             }
             $newObject->set('modelservices', $modelServicesIds);
@@ -88,7 +94,9 @@ class modRemontUrlGenerateProcessor extends modObjectProcessor
           foreach($problems as $problem){
             foreach($problem->get('categories') as $cat_id){
               $newObject = $this->modx->newObject('modRemontUrl');
-              $newObject->set('url', $base_path.$categoryUrls[$cat_id].'/'.$problem->get('uri')); 
+              $newObject->set('url', $categoryUrls[$cat_id].'/'.$problem->get('uri')); 
+              $breadcrumb = [$categoryUrls[$cat_id].'/'.$problem->get('uri') => $problem->get('pagetitle')] ;
+              $newObject->set('breadcrumb', [$categoryBreadcrumbs[$cat_id], $breadcrumb]);
               $newObject->set('pagetitle', $problem->get('pagetitle'));
               $newObject->set('type', 'problem');
               $newObject->set('type_id', $problem->get('id'));
@@ -105,9 +113,11 @@ class modRemontUrlGenerateProcessor extends modObjectProcessor
             }
           }
           foreach($services as $service){
-            foreach($problem->get('categories') as $cat_id){
+            foreach($service->get('categories') as $cat_id){
               $newObject = $this->modx->newObject('modRemontUrl');
-              $newObject->set('url', $base_path.$categoryUrls[$cat_id].'/'.$service->get('uri')); 
+              $newObject->set('url', $categoryUrls[$cat_id].'/'.$service->get('uri')); 
+              $breadcrumb = [$categoryUrls[$cat_id].'/'.$service->get('uri') => $service->get('pagetitle')] ;
+              $newObject->set('breadcrumb', [$categoryBreadcrumbs[$cat_id], $breadcrumb]);
               $newObject->set('pagetitle', $service->get('pagetitle'));
               $newObject->set('type', 'service');
               $newObject->set('type_id', $service->get('id'));
@@ -125,7 +135,10 @@ class modRemontUrlGenerateProcessor extends modObjectProcessor
           }
           foreach($modelservices as $modelservice){
               $newObject = $this->modx->newObject('modRemontUrl');
-              $newObject->set('url', $base_path.$categoryUrls[$models_category[$modelservice->get('model_id')]].'/'.$modelsUrls[$modelservice->get('model_id')].'/'.$modelservice->get('uri')); 
+              // $this->modx->log(1, print_r($modelsBreadcrumbs,1));
+              $breadcrumb = [$categoryUrls[$models_category[$modelservice->get('model_id')]].'/'.$modelsUrls[$modelservice->get('model_id')].'/'.$modelservice->get('uri') => $modelservice->get('pagetitle')];
+              $newObject->set('url', $categoryUrls[$models_category[$modelservice->get('model_id')]].'/'.$modelsUrls[$modelservice->get('model_id')].'/'.$modelservice->get('uri')); 
+              $newObject->set('breadcrumb', [$categoryBreadcrumbs[$models_category[$modelservice->get('model_id')]], $modelsBreadcrumbs[$modelservice->get('model_id')] , $breadcrumb]); 
               $newObject->set('pagetitle', $modelservice->get('pagetitle'));
               $newObject->set('type', 'modelservice');
               $newObject->set('type_id', $modelservice->get('id'));

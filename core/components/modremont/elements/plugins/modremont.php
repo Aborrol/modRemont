@@ -52,6 +52,7 @@ switch ($modx->event->name) {
                 if (!$data = $modx->getObject($objController[$type],['id' => $type_id, 'active' => 1])) {
                     return false;
                 }
+                $modx->setPlaceholder('breadcrumb_urls',$res->get('breadcrumb'));
                 $modx->setPlaceholder('template_id',$template_id);
                 $modx->toPlaceholders($data->toArray(), 'mr');
             
