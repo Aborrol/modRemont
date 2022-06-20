@@ -229,7 +229,7 @@ Ext.extend(modRemont.grid.Models, MODx.grid.Grid, {
     },
 
     getFields: function () {
-        return ['id', 'pagetitle','year','article', 'uri',  'description', 'image',  'category_name' , 'active', 'actions'];
+        return ['id', 'pagetitle','year','s_year','article', 'inches' , 'uri',  'description', 'image',  'category_name' , 'active', 'actions'];
     },
 
     getColumns: function () {
@@ -258,12 +258,17 @@ Ext.extend(modRemont.grid.Models, MODx.grid.Grid, {
             width: 150,
         }, {
             header: _('modremont_model_year'),
-            dataIndex: 'year',
+            dataIndex: 's_year',
             sortable: true,
             width: 150,
         }, {
             header: _('modremont_model_article'),
             dataIndex: 'article',
+            sortable: true,
+            width: 150,
+        }, {
+            header: _('modremont_model_inches'),
+            dataIndex: 'inches',
             sortable: true,
             width: 150,
         }, {

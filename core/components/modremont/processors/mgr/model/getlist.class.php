@@ -76,8 +76,10 @@ class modRemontModelGetListProcessor extends modObjectGetListProcessor
     {
         $array = $object->toArray();
 
+        $s_year = $array['season']? '' : $array['season'];
+        $array['s_year'] = $s_year.' '.$array['year'];
 
-        $array['actions'] = [];
+
 
         // Edit
         $array['actions'][] = [
