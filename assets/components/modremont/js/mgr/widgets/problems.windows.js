@@ -8,6 +8,7 @@ modRemont.window.CreateProblem = function (config) {
         width: 675,
         height: 675,
         autoHeight: false,
+        aliaswasempty: true,
         url: modRemont.config.connector_url,
         action: 'mgr/problem/create',
         fields: this.getFields(config),
@@ -25,7 +26,37 @@ modRemont.window.CreateProblem = function (config) {
     },this);
 };
 Ext.extend(modRemont.window.CreateProblem, MODx.Window, {
+    translitAlias: function(string) {
+        if (!this.config.translitloading) {
+            this.config.translitloading = true;
+            MODx.Ajax.request({
+                url: MODx.config.connector_url
+                ,params: {
+                    action: 'resource/translit'
+                    ,string: string
+                }
+                ,listeners: {
+                    'success': {fn:function(r) {
+                        var alias = Ext.getCmp('modx-problems-create-alias');
+                        if (!Ext.isEmpty(r.object.transliteration)) {
+                            alias.setValue(r.object.transliteration);
+                            this.config.translitloading = false;
+                        }
+                    },scope:this}
+                }
+            });
+        }
+    }
 
+    ,generateAliasRealTime: function(title) {
+        // check some system settings before doing real time alias transliteration
+        if (parseInt(MODx.config.friendly_alias_realtime) && parseInt(MODx.config.automatic_alias)) {
+            // handles the realtime-alias transliteration
+            if (this.config.aliaswasempty && title !== '') {
+                this.translitAlias(title);
+            }
+        }
+    },
     getFields: function (config) {
         return [{
             layout: 'column',
@@ -43,6 +74,19 @@ Ext.extend(modRemont.window.CreateProblem, MODx.Window, {
                     id: config.id + '-pagetitle',
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'keyup': {fn: function(f) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+                            this.generateAliasRealTime(title);
+                        }, scope: this}
+                        // also do realtime transliteration of alias on blur of pagetitle field
+                        // as sometimes (when typing very fast) the last letter(s) are not catched
+                        ,'blur': {fn: function(f,e) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+        
+                            this.generateAliasRealTime(title);
+                        }, scope: this}
+                    }
                 }],
             }, {
                 columnWidth: .50,
@@ -89,9 +133,18 @@ Ext.extend(modRemont.window.CreateProblem, MODx.Window, {
                     xtype: 'textfield',
                     fieldLabel: _('modremont_problem_uri'),
                     name: 'uri',
-                    id: config.id + '-uri',
+                    id: 'modx-problems-create-alias',
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'change': {fn: function(f,e) {
+                            this.config.aliaswasempty = false;
+                            // when the alias is manually cleared, enable real time alias
+                            if (Ext.isEmpty(f.getValue())) {
+                                this.config.aliaswasempty = true;
+                            }
+                        }, scope: this}
+                    }
                 }],
             },
         ],
@@ -145,6 +198,7 @@ modRemont.window.UpdateProblem = function (config) {
         width: 675,
         height: 675,
         autoHeight: false,
+        aliaswasempty: true,
         url: modRemont.config.connector_url,
         action: 'mgr/problem/update',
         fields: this.getFields(config),
@@ -163,7 +217,37 @@ modRemont.window.UpdateProblem = function (config) {
     },this);
 };
 Ext.extend(modRemont.window.UpdateProblem, MODx.Window, {
+    translitAlias: function(string) {
+        if (!this.config.translitloading) {
+            this.config.translitloading = true;
+            MODx.Ajax.request({
+                url: MODx.config.connector_url
+                ,params: {
+                    action: 'resource/translit'
+                    ,string: string
+                }
+                ,listeners: {
+                    'success': {fn:function(r) {
+                        var alias = Ext.getCmp('modx-problems-update-alias');
+                        if (!Ext.isEmpty(r.object.transliteration)) {
+                            alias.setValue(r.object.transliteration);
+                            this.config.translitloading = false;
+                        }
+                    },scope:this}
+                }
+            });
+        }
+    }
 
+    ,generateAliasRealTime: function(title) {
+        // check some system settings before doing real time alias transliteration
+        if (parseInt(MODx.config.friendly_alias_realtime) && parseInt(MODx.config.automatic_alias)) {
+            // handles the realtime-alias transliteration
+            if (this.config.aliaswasempty && title !== '') {
+                this.translitAlias(title);
+            }
+        }
+    },
     getFields: function (config) {
         return [{
             xtype: 'hidden',
@@ -185,6 +269,19 @@ Ext.extend(modRemont.window.UpdateProblem, MODx.Window, {
                     id: config.id + '-pagetitle',
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'keyup': {fn: function(f) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+                            this.generateAliasRealTime(title);
+                        }, scope: this}
+                        // also do realtime transliteration of alias on blur of pagetitle field
+                        // as sometimes (when typing very fast) the last letter(s) are not catched
+                        ,'blur': {fn: function(f,e) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+        
+                            this.generateAliasRealTime(title);
+                        }, scope: this}
+                    }
                 }],
             }, {
                 columnWidth: .50,
@@ -228,9 +325,18 @@ Ext.extend(modRemont.window.UpdateProblem, MODx.Window, {
                     xtype: 'textfield',
                     fieldLabel: _('modremont_problem_uri'),
                     name: 'uri',
-                    id: config.id + '-uri',
+                    id: 'modx-problems-update-alias',
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'change': {fn: function(f,e) {
+                            this.config.aliaswasempty = false;
+                            // when the alias is manually cleared, enable real time alias
+                            if (Ext.isEmpty(f.getValue())) {
+                                this.config.aliaswasempty = true;
+                            }
+                        }, scope: this}
+                    }
                 }],
             },
 

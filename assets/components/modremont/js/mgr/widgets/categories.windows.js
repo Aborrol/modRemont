@@ -7,6 +7,7 @@ modRemont.window.CreateCategory = function (config) {
         title: _('modremont_category_create'),
         width: 850,
         height: 800,
+        aliaswasempty: true,
         autoHeight: false,
         url: modRemont.config.connector_url,
         action: 'mgr/category/create',
@@ -24,7 +25,37 @@ modRemont.window.CreateCategory = function (config) {
     },this);
 };
 Ext.extend(modRemont.window.CreateCategory, MODx.Window, {
+    translitAlias: function(string) {
+        if (!this.config.translitloading) {
+            this.config.translitloading = true;
+            MODx.Ajax.request({
+                url: MODx.config.connector_url
+                ,params: {
+                    action: 'resource/translit'
+                    ,string: string
+                }
+                ,listeners: {
+                    'success': {fn:function(r) {
+                        var alias = Ext.getCmp('modx-categories-create-alias');
+                        if (!Ext.isEmpty(r.object.transliteration)) {
+                            alias.setValue(r.object.transliteration);
+                            this.config.translitloading = false;
+                        }
+                    },scope:this}
+                }
+            });
+        }
+    }
 
+    ,generateAliasRealTime: function(title) {
+        // check some system settings before doing real time alias transliteration
+        if (parseInt(MODx.config.friendly_alias_realtime) && parseInt(MODx.config.automatic_alias)) {
+            // handles the realtime-alias transliteration
+            if (this.config.aliaswasempty && title !== '') {
+                this.translitAlias(title);
+            }
+        }
+    },
     getFields: function (config) {
         return [{
             layout: 'column',
@@ -42,6 +73,19 @@ Ext.extend(modRemont.window.CreateCategory, MODx.Window, {
                     id: config.id + '-pagetitle',
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'keyup': {fn: function(f) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+                            this.generateAliasRealTime(title);
+                        }, scope: this}
+                        // also do realtime transliteration of alias on blur of pagetitle field
+                        // as sometimes (when typing very fast) the last letter(s) are not catched
+                        ,'blur': {fn: function(f,e) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+        
+                            this.generateAliasRealTime(title);
+                        }, scope: this}
+                    }
                 }],
             }, {
                 columnWidth: .50,
@@ -93,9 +137,18 @@ Ext.extend(modRemont.window.CreateCategory, MODx.Window, {
                     xtype: 'textfield',
                     fieldLabel: _('modremont_category_uri'),
                     name: 'uri',
-                    id: config.id + '-uri',
+                    id: 'modx-categories-create-alias',
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'change': {fn: function(f,e) {
+                            this.config.aliaswasempty = false;
+                            // when the alias is manually cleared, enable real time alias
+                            if (Ext.isEmpty(f.getValue())) {
+                                this.config.aliaswasempty = true;
+                            }
+                        }, scope: this}
+                    }
                 }],
             },
         ],
@@ -150,6 +203,7 @@ modRemont.window.UpdateCategory = function (config) {
         width: 850,
         height: 800,
         autoHeight: false,
+        aliaswasempty: true,
         url: modRemont.config.connector_url,
         action: 'mgr/category/update',
         fields: this.getFields(config),
@@ -166,7 +220,37 @@ modRemont.window.UpdateCategory = function (config) {
     },this);
 };
 Ext.extend(modRemont.window.UpdateCategory, MODx.Window, {
+    translitAlias: function(string) {
+        if (!this.config.translitloading) {
+            this.config.translitloading = true;
+            MODx.Ajax.request({
+                url: MODx.config.connector_url
+                ,params: {
+                    action: 'resource/translit'
+                    ,string: string
+                }
+                ,listeners: {
+                    'success': {fn:function(r) {
+                        var alias = Ext.getCmp('modx-categories-update-alias');
+                        if (!Ext.isEmpty(r.object.transliteration)) {
+                            alias.setValue(r.object.transliteration);
+                            this.config.translitloading = false;
+                        }
+                    },scope:this}
+                }
+            });
+        }
+    }
 
+    ,generateAliasRealTime: function(title) {
+        // check some system settings before doing real time alias transliteration
+        if (parseInt(MODx.config.friendly_alias_realtime) && parseInt(MODx.config.automatic_alias)) {
+            // handles the realtime-alias transliteration
+            if (this.config.aliaswasempty && title !== '') {
+                this.translitAlias(title);
+            }
+        }
+    },
     getFields: function (config) {
         return [{
             xtype: 'hidden',
@@ -187,7 +271,20 @@ Ext.extend(modRemont.window.UpdateCategory, MODx.Window, {
                     name: 'pagetitle',
                     id: config.id + '-pagetitle',
                     anchor: '99%',
-                    allowBlank: false,
+                    allowBlank: false
+                    ,listeners: {
+                        'keyup': {fn: function(f) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+                            this.generateAliasRealTime(title);
+                        }, scope: this}
+                        // also do realtime transliteration of alias on blur of pagetitle field
+                        // as sometimes (when typing very fast) the last letter(s) are not catched
+                        ,'blur': {fn: function(f,e) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+        
+                            this.generateAliasRealTime(title);
+                        }, scope: this}
+                    }
                 }],
             }, {
                 columnWidth: .50,
@@ -239,9 +336,18 @@ Ext.extend(modRemont.window.UpdateCategory, MODx.Window, {
                     xtype: 'textfield',
                     fieldLabel: _('modremont_category_uri'),
                     name: 'uri',
-                    id: config.id + '-uri',
+                    id: 'modx-categories-update-alias',
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'change': {fn: function(f,e) {
+                            this.config.aliaswasempty = false;
+                            // when the alias is manually cleared, enable real time alias
+                            if (Ext.isEmpty(f.getValue())) {
+                                this.config.aliaswasempty = true;
+                            }
+                        }, scope: this}
+                    }
                 }],
             },
         ],
