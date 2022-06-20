@@ -23,8 +23,12 @@
     <object class="modRemontModel" table="modremont_models" extends="xPDOSimpleObject">
         <field key="pagetitle" dbtype="varchar" precision="191" phptype="string" null="false" default="" index="fulltext"/>
         <field key="longtitle" dbtype="varchar" precision="191" phptype="string" null="false" default="" index="fulltext"/>
-        <field key="year" dbtype="varchar" precision="50" phptype="string" null="false" />
+        <field key="year" dbtype="varchar" precision="50" phptype="string" null="true" />
+        <field key="season" dbtype="varchar" precision="50" phptype="string" null="true" />
+        <field key="inches" dbtype="varchar" precision="50" phptype="string" null="true" />
         <field key="article" dbtype="varchar" precision="50" phptype="string" null="false" />
+        <field key="article_dop" dbtype="varchar" precision="150" phptype="string" null="true" />
+        <field key="model_name" dbtype="varchar" precision="150" phptype="string" null="false" />
         <field key="category_id" dbtype="int" precision="10" phptype="integer" null="false" />
         <field key="uri" dbtype="text" phptype="string" null="true" index="index" />
         <field key="image" dbtype="varchar" precision="255" phptype="string" null="false" />
@@ -133,7 +137,7 @@
         <field key="pagetitle" dbtype="varchar" precision="191" phptype="string" null="false" default="" index="fulltext"/>
         <field key="type" dbtype="varchar" precision="191" phptype="string" null="false" default="" index="index"/>
         <field key="type_id" dbtype="int" precision="10" phptype="integer" attributes="unsigned" null="false"/>
-
+        <field key="breadcrumb" dbtype="text" phptype="json" null="true"/>
         <field key="category_id"  dbtype="int" precision="10" phptype="integer" attributes="unsigned" null="true"/>
         <field key="models" dbtype="text" phptype="json" null="true"/>
         <field key="defects" dbtype="text" phptype="json" null="true"/>

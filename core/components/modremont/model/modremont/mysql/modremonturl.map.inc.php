@@ -14,6 +14,7 @@ $xpdo_meta_map['modRemontUrl']= array (
     'pagetitle' => '',
     'type' => '',
     'type_id' => NULL,
+    'breadcrumb' => NULL,
     'category_id' => NULL,
     'models' => NULL,
     'defects' => NULL,
@@ -56,6 +57,12 @@ $xpdo_meta_map['modRemontUrl']= array (
       'phptype' => 'integer',
       'attributes' => 'unsigned',
       'null' => false,
+    ),
+    'breadcrumb' => 
+    array (
+      'dbtype' => 'text',
+      'phptype' => 'json',
+      'null' => true,
     ),
     'category_id' => 
     array (

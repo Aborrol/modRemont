@@ -13,7 +13,11 @@ $xpdo_meta_map['modRemontModel']= array (
     'pagetitle' => '',
     'longtitle' => '',
     'year' => NULL,
+    'season' => NULL,
+    'inches' => NULL,
     'article' => NULL,
+    'article_dop' => NULL,
+    'model_name' => NULL,
     'category_id' => NULL,
     'uri' => NULL,
     'image' => NULL,
@@ -48,12 +52,40 @@ $xpdo_meta_map['modRemontModel']= array (
       'dbtype' => 'varchar',
       'precision' => '50',
       'phptype' => 'string',
-      'null' => false,
+      'null' => true,
+    ),
+    'season' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '50',
+      'phptype' => 'string',
+      'null' => true,
+    ),
+    'inches' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '50',
+      'phptype' => 'string',
+      'null' => true,
     ),
     'article' => 
     array (
       'dbtype' => 'varchar',
       'precision' => '50',
+      'phptype' => 'string',
+      'null' => false,
+    ),
+    'article_dop' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '150',
+      'phptype' => 'string',
+      'null' => true,
+    ),
+    'model_name' => 
+    array (
+      'dbtype' => 'varchar',
+      'precision' => '150',
       'phptype' => 'string',
       'null' => false,
     ),
