@@ -95,7 +95,6 @@ Ext.extend(modRemont.window.CreateModel, MODx.Window, {
             border: false,
             anchor: '99%',
             items: [{ 
-                
                 columnWidth: .30,
                 layout: 'form',
                 defaults: {msgTarget: 'under'},

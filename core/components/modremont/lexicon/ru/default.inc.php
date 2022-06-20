@@ -33,8 +33,12 @@ $_lang['modremont_modelservice_addbatch_fromcategory'] = 'Добавить вс�
 
 $_lang['modremont_models'] = 'Модели';
 $_lang['modremont_model_id'] = 'Id';
-$_lang['modremont_model_pagetitle'] = 'Наименование';
-$_lang['modremont_model_longtitle'] = 'Расширенное наименование';
+$_lang['modremont_model_pagetitle'] = 'Заголовок';
+$_lang['modremont_model_model_name'] = 'Название модели';
+$_lang['modremont_model_inches'] = 'Заголовок';
+$_lang['modremont_model_article_dop'] = 'Доп артикулы';
+$_lang['modremont_model_season'] = 'Часть года(early,middle,late)';
+$_lang['modremont_model_longtitle'] = 'Расширенный заголовок';
 $_lang['modremont_model_image'] = 'Изображение';
 $_lang['modremont_model_category'] = 'Категория';
 $_lang['modremont_model_content'] = 'Контент';
