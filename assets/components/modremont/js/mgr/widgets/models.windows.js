@@ -270,9 +270,9 @@ Ext.extend(modRemont.window.UpdateModel, MODx.Window, {
                 border: false,
                 items: [{
                     xtype: 'textfield',
-                    fieldLabel: _('modremont_model_pagetitle'),
-                    name: 'pagetitle',
-                    id: config.id + '-pagetitle',
+                    fieldLabel: _('modremont_model_model_name'),
+                    name: 'model_name',
+                    id: config.id + '-model_name',
                     anchor: '99%',
                     allowBlank: false,
                 }],
@@ -290,19 +290,57 @@ Ext.extend(modRemont.window.UpdateModel, MODx.Window, {
             }]
         }, 
         {
-            xtype: 'textfield',
-            fieldLabel: _('modremont_model_longtitle'),
-            name: 'longtitle',
-            id: config.id + '-longtitle',
-            anchor: '99%',
-            allowBlank: true,
-        },
-        {
             layout: 'column',
             border: false,
             anchor: '99%',
             items: [{
                 columnWidth: .50,
+                layout: 'form',
+                defaults: {msgTarget: 'under'},
+                border: false,
+                items: [{
+                    xtype: 'textfield',
+                    fieldLabel: _('modremont_model_pagetitle'),
+                    name: 'pagetitle',
+                    id: config.id + '-pagetitle',
+                    anchor: '99%',
+                    allowBlank: false,
+                }],
+            }, {
+                columnWidth: .50,
+                layout: 'form',
+                defaults: {msgTarget: 'under'},
+                border: false,
+                items: [        {
+                    xtype: 'textfield',
+                    fieldLabel: _('modremont_model_longtitle'),
+                    name: 'longtitle',
+                    id: config.id + '-longtitle',
+                    anchor: '99%',
+                    allowBlank: true,
+                },],
+            }]
+        },
+
+        {
+            layout: 'column',
+            border: false,
+            anchor: '99%',
+            items: [{ 
+                columnWidth: .30,
+                layout: 'form',
+                defaults: {msgTarget: 'under'},
+                border: false,
+                items: [{
+                    xtype: 'textfield',
+                    fieldLabel: _('modremont_model_season'),
+                    name: 'season',
+                    id: config.id + '-season',
+                    anchor: '99%',
+                    allowBlank: false,
+                }],
+            },{
+                columnWidth: .20,
                 layout: 'form',
                 defaults: {msgTarget: 'under'},
                 border: false,
@@ -328,7 +366,16 @@ Ext.extend(modRemont.window.UpdateModel, MODx.Window, {
                     allowBlank: false,
                 }],
             }]
-        }, {
+        },
+        {
+            xtype: 'textfield',
+            fieldLabel: _('modremont_model_article_dop'),
+            name: 'article_dop',
+            id: config.id + '-article_dop',
+            anchor: '99%',
+            allowBlank: true,
+        },
+        {
             layout: 'column',
             border: false,
             anchor: '99%',
