@@ -120,8 +120,21 @@ Ext.extend(modRemont.window.CreateModel, MODx.Window, {
                     anchor: '99%',
                     allowBlank: false,
                 }],
-            }, {
-                columnWidth: .50,
+            },{
+                columnWidth: .20,
+                layout: 'form',
+                defaults: {msgTarget: 'under'},
+                border: false,
+                items: [{
+                    xtype: 'textfield',
+                    fieldLabel: _('modremont_model_inches'),
+                    name: 'inches',
+                    id: config.id + '-inches',
+                    anchor: '99%',
+                    allowBlank: false,
+                }],
+            },{
+                columnWidth: .30,
                 layout: 'form',
                 defaults: {msgTarget: 'under'},
                 border: false,
@@ -353,7 +366,20 @@ Ext.extend(modRemont.window.UpdateModel, MODx.Window, {
                     allowBlank: false,
                 }],
             }, {
-                columnWidth: .50,
+                columnWidth: .20,
+                layout: 'form',
+                defaults: {msgTarget: 'under'},
+                border: false,
+                items: [{
+                    xtype: 'textfield',
+                    fieldLabel: _('modremont_model_inches'),
+                    name: 'inches',
+                    id: config.id + '-inches',
+                    anchor: '99%',
+                    allowBlank: false,
+                }],
+            },{
+                columnWidth: .30,
                 layout: 'form',
                 defaults: {msgTarget: 'under'},
                 border: false,
