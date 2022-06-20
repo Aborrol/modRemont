@@ -1,8 +1,8 @@
 <?php
 
 return [
-    // 'tpl.modRemont.item' => [
-    //     'file' => 'item',
-    //     'description' => '',
-    // ],
+    'modRemontCrumbs' => [
+        'file' => 'modRemontCrumbs',
+        'description' => 'Пример вызова сниппета modRemontCrumbs',
+    ],
 ];
