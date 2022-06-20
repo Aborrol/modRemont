@@ -134,7 +134,16 @@ Ext.extend(modRemont.window.CreateModel, MODx.Window, {
                     allowBlank: false,
                 }],
             }]
-        }, {
+        },
+        {
+            xtype: 'textfield',
+            fieldLabel: _('modremont_model_article_dop'),
+            name: 'article_dop',
+            id: config.id + '-article_dop',
+            anchor: '99%',
+            allowBlank: true,
+        },
+        {
             layout: 'column',
             border: false,
             anchor: '99%',
