@@ -11,6 +11,12 @@ modRemont.window.CreateModel = function (config) {
         url: modRemont.config.connector_url,
         action: 'mgr/model/create',
         fields: this.getFields(config),
+        model_inches: '',
+        model_title: '',
+        model_year: '',
+        model_season: '',
+        model_article: '',
+        namewasempty: true,
         keys: [{
             key: Ext.EventObject.ENTER, shift: true, fn: function () {
                 this.submit()
@@ -26,25 +32,80 @@ modRemont.window.CreateModel = function (config) {
 };
 Ext.extend(modRemont.window.CreateModel, MODx.Window, {
 
+    translitAlias: function(string) {
+        if (!this.config.translitloading) {
+            this.config.translitloading = true;
+            MODx.Ajax.request({
+                url: MODx.config.connector_url
+                ,params: {
+                    action: 'resource/translit'
+                    ,string: string
+                }
+                ,listeners: {
+                    'success': {fn:function(r) {
+                        var alias = Ext.getCmp('modremont-model-window-create-uri');
+                        if (!Ext.isEmpty(r.object.transliteration)) {
+                            alias.setValue(r.object.transliteration);
+                            this.config.translitloading = false;
+                        }
+                    },scope:this}
+                }
+            });
+        }
+    },
+    generateAliasRealTime: function(title) {
+        // check some system settings before doing real time alias transliteration
+        if (parseInt(MODx.config.friendly_alias_realtime) && parseInt(MODx.config.automatic_alias)) {
+
+            if (title !== '') {
+                this.translitAlias(title);
+            }
+        }
+    },
+    generatePagetitleRealTime: function(title) {
+            if (title !== '') {
+                var pagetitle = Ext.getCmp('modremont-model-window-create-pagetitle');
+                pagetitle.setValue(title);
+            }
+
+    },
+    generateLongtitleRealTime: function(title) {
+
+            if (title !== '') {
+                var pagetitle = Ext.getCmp('modremont-model-window-create-longtitle');
+
+
+                pagetitle.setValue(title);
+            }
+
+    },
+    generateAliasRealTime: function(title) {
+        // check some system settings before doing real time alias transliteration
+        if (parseInt(MODx.config.friendly_alias_realtime) && parseInt(MODx.config.automatic_alias)) {
+
+            if (this.config.aliaswasempty && title !== '') {
+                this.translitAlias(title);
+            }
+        }
+    },
+    generateModelNameRealTime: function(title) {
+            if (this.config.namewasempty && title !== '') {
+               
+                var modelname = Ext.getCmp('modremont-model-window-create-model_name');
+                modelname.setValue(title);
+                this.config.model_title = title;
+                this.generateAliasRealTime(this.config.model_title+' '+this.config.model_season+' '+this.config.model_year+' '+this.config.model_inches+'inch '+this.config.model_article);
+                this.generatePagetitleRealTime(this.config.model_title+' '+this.config.model_year+' '+this.config.model_inches+'\'');
+                this.generateLongtitleRealTime(this.config.model_title+' ('+this.config.model_season+' '+this.config.model_year+') '+this.config.model_inches+'\' '+this.config.model_article);
+
+            }
+    },
     getFields: function (config) {
         return [{
             layout: 'column',
             border: false,
             anchor: '99%',
-            items: [{
-                columnWidth: .50,
-                layout: 'form',
-                defaults: {msgTarget: 'under'},
-                border: false,
-                items: [{
-                    xtype: 'textfield',
-                    fieldLabel: _('modremont_model_model_name'),
-                    name: 'model_name',
-                    id: config.id + '-model_name',
-                    anchor: '99%',
-                    allowBlank: false,
-                }],
-            }, {
+            items: [ {
                 columnWidth: .50,
                 layout: 'form',
                 defaults: {msgTarget: 'under'},
@@ -54,8 +115,43 @@ Ext.extend(modRemont.window.CreateModel, MODx.Window, {
                     fieldLabel: _('modremont_model_category'),
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'select': {fn: function(f,e) {
+                            this.generateModelNameRealTime(e.data.pagetitle);
+                        }, scope: this}
+                    }
                 }],
-            }]
+            },{
+                columnWidth: .50,
+                layout: 'form',
+                defaults: {msgTarget: 'under'},
+                border: false,
+                items: [{
+                    xtype: 'textfield',
+                    fieldLabel: _('modremont_model_model_name'),
+                    name: 'model_name',
+                    id: 'modremont-model-window-create-model_name',
+                    anchor: '99%',
+                    allowBlank: false,
+                    listeners: {
+                        'change': {fn: function(f,e) {
+                            // when the alias is manually cleared, enable real time alias
+                            this.config.namewasempty = false;
+                            if (Ext.isEmpty(f.getValue())) {
+                                this.config.namewasempty = true;
+                            }
+                            
+                        }, scope: this},
+                        'blur': {fn: function(f,e) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+                            this.config.model_title = title;
+                            this.generateAliasRealTime(this.config.model_title+' '+this.config.model_season+' '+this.config.model_year+' '+this.config.model_inches+'inch '+this.config.model_article);
+                            this.generatePagetitleRealTime(this.config.model_title+' '+this.config.model_year+' '+this.config.model_inches+'\'');
+                            this.generateLongtitleRealTime(this.config.model_title+' ('+this.config.model_season+' '+this.config.model_year+') '+this.config.model_inches+'\' '+this.config.model_article);
+                        }, scope: this}
+                    }
+                }],
+            },]
         }, 
         {
             layout: 'column',
@@ -70,9 +166,10 @@ Ext.extend(modRemont.window.CreateModel, MODx.Window, {
                     xtype: 'textfield',
                     fieldLabel: _('modremont_model_pagetitle'),
                     name: 'pagetitle',
-                    id: config.id + '-pagetitle',
+                    id: 'modremont-model-window-create-pagetitle',
                     anchor: '99%',
                     allowBlank: false,
+                    readOnly: true
                 }],
             }, {
                 columnWidth: .50,
@@ -83,9 +180,10 @@ Ext.extend(modRemont.window.CreateModel, MODx.Window, {
                     xtype: 'textfield',
                     fieldLabel: _('modremont_model_longtitle'),
                     name: 'longtitle',
-                    id: config.id + '-longtitle',
+                    id: 'modremont-model-window-create-longtitle',
                     anchor: '99%',
                     allowBlank: true,
+                    readOnly: true
                 },],
             }]
         },
@@ -106,6 +204,14 @@ Ext.extend(modRemont.window.CreateModel, MODx.Window, {
                     id: config.id + '-season',
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'blur': {fn: function(f,e) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+                            this.config.model_season = title;
+                            this.generateAliasRealTime(this.config.model_title+' '+this.config.model_season+' '+this.config.model_year+' '+this.config.model_inches+'inch '+this.config.model_article);
+                            // this.generatePagetitleRealTime(this.config.model_title+' '+this.config.model_year+' '+this.config.model_inches+'\'');
+                            this.generateLongtitleRealTime(this.config.model_title+' ('+this.config.model_season+' '+this.config.model_year+') '+this.config.model_inches+'\' '+this.config.model_article);                        }, scope: this}
+                    }
                 }],
             },{
                 columnWidth: .20,
@@ -119,6 +225,14 @@ Ext.extend(modRemont.window.CreateModel, MODx.Window, {
                     id: config.id + '-year',
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'blur': {fn: function(f,e) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+                            this.config.model_year = title;
+                            this.generateAliasRealTime(this.config.model_title+' '+this.config.model_season+' '+this.config.model_year+' '+this.config.model_inches+'inch '+this.config.model_article);
+                            this.generatePagetitleRealTime(this.config.model_title+' '+this.config.model_year+' '+this.config.model_inches+'\'');
+                            this.generateLongtitleRealTime(this.config.model_title+' ('+this.config.model_season+' '+this.config.model_year+') '+this.config.model_inches+'\' '+this.config.model_article);                        }, scope: this}
+                    }
                 }],
             },{
                 columnWidth: .20,
@@ -132,6 +246,14 @@ Ext.extend(modRemont.window.CreateModel, MODx.Window, {
                     id: config.id + '-inches',
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'blur': {fn: function(f,e) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+                            this.config.model_inches = title;
+                            this.generateAliasRealTime(this.config.model_title+' '+this.config.model_season+' '+this.config.model_year+' '+this.config.model_inches+'inch '+this.config.model_article);
+                            this.generatePagetitleRealTime(this.config.model_title+' '+this.config.model_year+' '+this.config.model_inches+'\'');
+                            this.generateLongtitleRealTime(this.config.model_title+' ('+this.config.model_season+' '+this.config.model_year+') '+this.config.model_inches+'\' '+this.config.model_article);                        }, scope: this}
+                    }
                 }],
             },{
                 columnWidth: .30,
@@ -145,6 +267,14 @@ Ext.extend(modRemont.window.CreateModel, MODx.Window, {
                     id: config.id + '-article',
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'blur': {fn: function(f,e) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+                            this.config.model_article = title;
+                            this.generateAliasRealTime(this.config.model_title+' '+this.config.model_season+' '+this.config.model_year+' '+this.config.model_inches+'inch '+this.config.model_article);
+                            // this.generatePagetitleRealTime(this.config.model_title+' '+this.config.model_year+' '+this.config.model_inches+'\'');
+                            this.generateLongtitleRealTime(this.config.model_title+' ('+this.config.model_season+' '+this.config.model_year+') '+this.config.model_inches+'\' '+this.config.model_article);                        }, scope: this}
+                    }
                 }],
             }]
         },
@@ -184,9 +314,10 @@ Ext.extend(modRemont.window.CreateModel, MODx.Window, {
                     xtype: 'textfield',
                     fieldLabel: _('modremont_model_uri'),
                     name: 'uri',
-                    id: config.id + '-uri',
+                    id: 'modremont-model-window-create-uri',
                     anchor: '99%',
                     allowBlank: false,
+                    readOnly: true
                 }],
             },
 
@@ -251,6 +382,12 @@ modRemont.window.UpdateModel = function (config) {
         url: modRemont.config.connector_url,
         action: 'mgr/model/update',
         fields: this.getFields(config),
+        // model_category: config.record.object.category_id,
+        model_inches: config.record.object.inches,
+        model_title: config.record.object.model_name,
+        model_year: config.record.object.year,
+        model_season: config.record.object.season,
+        model_article: config.record.object.article,
         keys: [{
             key: Ext.EventObject.ENTER, shift: true, fn: function () {
                 this.submit()
@@ -266,8 +403,71 @@ modRemont.window.UpdateModel = function (config) {
     },this);
 };
 Ext.extend(modRemont.window.UpdateModel, MODx.Window, {
+        // used for realtime-alias transliteration
+        translitAlias: function(string) {
+            if (!this.config.translitloading) {
+                this.config.translitloading = true;
+                MODx.Ajax.request({
+                    url: MODx.config.connector_url
+                    ,params: {
+                        action: 'resource/translit'
+                        ,string: string
+                    }
+                    ,listeners: {
+                        'success': {fn:function(r) {
+                            var alias = Ext.getCmp('modremont-model-window-update-uri');
+                            if (!Ext.isEmpty(r.object.transliteration)) {
+                                alias.setValue(r.object.transliteration);
+                                this.config.translitloading = false;
+                            }
+                        },scope:this}
+                    }
+                });
+            }
+        },
+        generateAliasRealTime: function(title) {
+            // check some system settings before doing real time alias transliteration
+            if (parseInt(MODx.config.friendly_alias_realtime) && parseInt(MODx.config.automatic_alias)) {
     
+                if (title !== '') {
+                    this.translitAlias(title);
+                }
+            }
+        },
+        generatePagetitleRealTime: function(title) {
+    
+                if (title !== '') {
+                    var pagetitle = Ext.getCmp('modremont-model-window-update-pagetitle');
+    
+    
+                    pagetitle.setValue(title);
+                }
+
+        },
+        generateLongtitleRealTime: function(title) {
+    
+                if (title !== '') {
+                    var pagetitle = Ext.getCmp('modremont-model-window-update-longtitle');
+    
+    
+                    pagetitle.setValue(title);
+                }
+
+        },
+        generateModelNameRealTime: function(title) {
+                if (this.config.namewasempty && title !== '') {
+                   
+                    var modelname = Ext.getCmp('modremont-model-window-update-model_name');
+                    modelname.setValue(title);
+                    this.config.model_title = title;
+                    this.generateAliasRealTime(this.config.model_title+' '+this.config.model_season+' '+this.config.model_year+' '+this.config.model_inches+'inch '+this.config.model_article);
+                    this.generatePagetitleRealTime(this.config.model_title+' '+this.config.model_year+' '+this.config.model_inches+'\'');
+                    this.generateLongtitleRealTime(this.config.model_title+' ('+this.config.model_season+' '+this.config.model_year+') '+this.config.model_inches+'\' '+this.config.model_article);
+    
+                }
+        },
     getFields: function (config) {
+        console.log('this.config');
         return [{
             xtype: 'hidden',
             name: 'id',
@@ -282,23 +482,45 @@ Ext.extend(modRemont.window.UpdateModel, MODx.Window, {
                 defaults: {msgTarget: 'under'},
                 border: false,
                 items: [{
-                    xtype: 'textfield',
-                    fieldLabel: _('modremont_model_model_name'),
-                    name: 'model_name',
-                    id: config.id + '-model_name',
+                    xtype: 'modremont-combo-category',
+                    fieldLabel: _('modremont_model_category'),
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'select': {fn: function(f,e) {
+                            this.generateModelNameRealTime(e.data.pagetitle);
+                        }, scope: this}
+                    }
                 }],
-            }, {
+            },{
                 columnWidth: .50,
                 layout: 'form',
                 defaults: {msgTarget: 'under'},
                 border: false,
                 items: [{
-                    xtype: 'modremont-combo-category',
-                    fieldLabel: _('modremont_model_category'),
+                    xtype: 'textfield',
+                    fieldLabel: _('modremont_model_model_name'),
+                    name: 'model_name',
+                    id: 'modremont-model-window-update-model_name',
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'change': {fn: function(f,e) {
+                            // when the alias is manually cleared, enable real time alias
+                            this.config.namewasempty = false;
+                            if (Ext.isEmpty(f.getValue())) {
+                                this.config.namewasempty = true;
+                            }
+                            
+                        }, scope: this},
+                        'blur': {fn: function(f,e) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+                            this.config.model_title = title;
+                            this.generateAliasRealTime(this.config.model_title+' '+this.config.model_season+' '+this.config.model_year+' '+this.config.model_inches+'inch '+this.config.model_article);
+                            this.generatePagetitleRealTime(this.config.model_title+' '+this.config.model_year+' '+this.config.model_inches+'\'');
+                            this.generateLongtitleRealTime(this.config.model_title+' ('+this.config.model_season+' '+this.config.model_year+') '+this.config.model_inches+'\' '+this.config.model_article);
+                        }, scope: this}
+                    }
                 }],
             }]
         }, 
@@ -315,9 +537,11 @@ Ext.extend(modRemont.window.UpdateModel, MODx.Window, {
                     xtype: 'textfield',
                     fieldLabel: _('modremont_model_pagetitle'),
                     name: 'pagetitle',
-                    id: config.id + '-pagetitle',
+                    id: 'modremont-model-window-update-pagetitle',
                     anchor: '99%',
                     allowBlank: false,
+                    readOnly: true
+
                 }],
             }, {
                 columnWidth: .50,
@@ -328,9 +552,10 @@ Ext.extend(modRemont.window.UpdateModel, MODx.Window, {
                     xtype: 'textfield',
                     fieldLabel: _('modremont_model_longtitle'),
                     name: 'longtitle',
-                    id: config.id + '-longtitle',
+                    id: 'modremont-model-window-update-longtitle',
                     anchor: '99%',
                     allowBlank: true,
+                    readOnly: true
                 },],
             }]
         },
@@ -351,6 +576,14 @@ Ext.extend(modRemont.window.UpdateModel, MODx.Window, {
                     id: config.id + '-season',
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'blur': {fn: function(f,e) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+                            this.config.model_season = title;
+                            this.generateAliasRealTime(this.config.model_title+' '+this.config.model_season+' '+this.config.model_year+' '+this.config.model_inches+'inch '+this.config.model_article);
+                            // this.generatePagetitleRealTime(this.config.model_title+' '+this.config.model_year+' '+this.config.model_inches+'\'');
+                            this.generateLongtitleRealTime(this.config.model_title+' ('+this.config.model_season+' '+this.config.model_year+') '+this.config.model_inches+'\' '+this.config.model_article);                        }, scope: this}
+                    }
                 }],
             },{
                 columnWidth: .20,
@@ -364,6 +597,14 @@ Ext.extend(modRemont.window.UpdateModel, MODx.Window, {
                     id: config.id + '-year',
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'blur': {fn: function(f,e) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+                            this.config.model_year = title;
+                            this.generateAliasRealTime(this.config.model_title+' '+this.config.model_season+' '+this.config.model_year+' '+this.config.model_inches+'inch '+this.config.model_article);
+                            this.generatePagetitleRealTime(this.config.model_title+' '+this.config.model_year+' '+this.config.model_inches+'\'');
+                            this.generateLongtitleRealTime(this.config.model_title+' ('+this.config.model_season+' '+this.config.model_year+') '+this.config.model_inches+'\' '+this.config.model_article);                        }, scope: this}
+                    }
                 }],
             }, {
                 columnWidth: .20,
@@ -377,6 +618,14 @@ Ext.extend(modRemont.window.UpdateModel, MODx.Window, {
                     id: config.id + '-inches',
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'blur': {fn: function(f,e) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+                            this.config.model_inches = title;
+                            this.generateAliasRealTime(this.config.model_title+' '+this.config.model_season+' '+this.config.model_year+' '+this.config.model_inches+'inch '+this.config.model_article);
+                            this.generatePagetitleRealTime(this.config.model_title+' '+this.config.model_year+' '+this.config.model_inches+'\'');
+                            this.generateLongtitleRealTime(this.config.model_title+' ('+this.config.model_season+' '+this.config.model_year+') '+this.config.model_inches+'\' '+this.config.model_article);                        }, scope: this}
+                    }
                 }],
             },{
                 columnWidth: .30,
@@ -390,6 +639,14 @@ Ext.extend(modRemont.window.UpdateModel, MODx.Window, {
                     id: config.id + '-article',
                     anchor: '99%',
                     allowBlank: false,
+                    listeners: {
+                        'blur': {fn: function(f,e) {
+                            var title = Ext.util.Format.stripTags(f.getValue());
+                            this.config.model_article = title;
+                            this.generateAliasRealTime(this.config.model_title+' '+this.config.model_season+' '+this.config.model_year+' '+this.config.model_inches+'inch '+this.config.model_article);
+                            // this.generatePagetitleRealTime(this.config.model_title+' '+this.config.model_year+' '+this.config.model_inches+'\'');
+                            this.generateLongtitleRealTime(this.config.model_title+' ('+this.config.model_season+' '+this.config.model_year+') '+this.config.model_inches+'\' '+this.config.model_article);                        }, scope: this}
+                    }
                 }],
             }]
         },
@@ -429,9 +686,10 @@ Ext.extend(modRemont.window.UpdateModel, MODx.Window, {
                     xtype: 'textfield',
                     fieldLabel: _('modremont_model_uri'),
                     name: 'uri',
-                    id: config.id + '-uri',
+                    id: 'modremont-model-window-update-uri',
                     anchor: '99%',
                     allowBlank: false,
+                    readOnly: true
                 }],
             },
 
