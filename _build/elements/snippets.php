@@ -1,9 +1,13 @@
 <?php
 
 return [
+    'modRemontSitemap' => [
+        'file' => 'modRemontSitemap',
+        'description' => 'modRemont snippet to output breadcrumbs',
+    ],
     'modRemontCrumbs' => [
         'file' => 'modRemontCrumbs',
-        'description' => 'modRemont snippet to list items',
+        'description' => 'modRemont snippet to output breadcrumbs',
         'properties' => array(
             'showLog' => array(
                 'type' => 'combo-boolean',
